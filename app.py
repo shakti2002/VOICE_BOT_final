@@ -1,15 +1,11 @@
 
-
 import os
 import threading
-from dotenv import load_dotenv
 from flask import Flask, render_template, jsonify, send_from_directory
 import speech_recognition as sr
 import google.generativeai as genai
 from gtts import gTTS
 
-# === Gemini Configuration ===
-load_dotenv()
 GOOGLE_API_KEY = os.environ.get("GEMINI_API_KEY")  # Use env variable
 genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel(model_name="gemini-1.5-flash")
