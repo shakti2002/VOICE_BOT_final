@@ -1,9 +1,4 @@
 
-
-
-
-
-
 import os
 import tempfile
 import whisper
