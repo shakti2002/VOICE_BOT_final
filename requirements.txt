@@ -1,8 +1,5 @@
 Flask==2.3.3
 gTTS==2.5.1
-google-generativeai==0.3.2
-torch
-setuptools<81
-git+https://github.com/openai/whisper.git
-torch
-torchaudio
+google-generativeai==0.5.4
+vosk==0.3.45
+pydub==0.25.1
