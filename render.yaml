@@ -2,6 +2,7 @@ services:
   - type: web
     name: gemini-voice-bot
     env: python
+    pythonVersion: 3.11           # 🔥 This is the key fix
     buildCommand: |
       apt-get update && apt-get install -y ffmpeg
       pip install -r requirements.txt

@@ -3,6 +3,4 @@ gTTS==2.5.1
 google-generativeai==0.5.4
 vosk==0.3.45
 pydub==0.25.1
-dotenv
-faster-whisper
-audioop
+python-dotenv==1.0.1
