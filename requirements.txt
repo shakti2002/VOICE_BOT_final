@@ -1,5 +1,5 @@
-Flask
-gTTS
-google-generativeai
-openai-whisper
-torch
+Flask==2.3.3
+gTTS==2.5.1
+google-generativeai==0.3.2
+openai-whisper==20231117
+torch==2.2.2
