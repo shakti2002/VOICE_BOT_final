@@ -62,5 +62,5 @@ def get_audio():
     return send_file("static/response.mp3", mimetype="audio/mpeg")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000)
 
