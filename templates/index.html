@@ -1,7 +1,10 @@
- <!DOCTYPE html>
+
+
+
+<!DOCTYPE html>
 <html>
 <head>
-  <title>Voice Assistant</title>
+  <title>Gemini Voice Assistant</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 40px; }
     .chatbox { max-width: 700px; margin: auto; }
@@ -9,85 +12,45 @@
     .user { background-color: #d1e7dd; text-align: right; }
     .bot { background-color: #f8d7da; text-align: left; }
     .controls { text-align: center; margin-bottom: 20px; }
-    .controls button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin: 0 10px;
-      cursor: pointer;
-    }
+    button { padding: 10px 20px; font-size: 16px; margin: 0 10px; }
   </style>
 </head>
 <body>
   <h2 style="text-align:center;">🎤 Gemini Voice Assistant</h2>
-  <p style="text-align:center;"><i>👆 Click once anywhere to allow audio playback</i></p>
-
   <div class="controls">
-    <button onclick="startListening()">🎙️ Start Listening</button>
-    <button onclick="stopListening()">🛑 Stop Listening</button>
+    <button onclick="startRecording()">🎙️ Speak</button>
   </div>
-
   <div class="chatbox" id="chatbox"></div>
-
-  <audio id="audioPlayer" autoplay muted></audio>
+  <audio id="audioPlayer" autoplay></audio>
 
   <script>
-    let lastLength = 0;
-    let hasInteracted = false;
+    const player = document.getElementById("audioPlayer");
+    const chatbox = document.getElementById("chatbox");
 
-    document.addEventListener('click', () => {
-      const player = document.getElementById("audioPlayer");
-      if (!hasInteracted) {
-        player.muted = false;
-        hasInteracted = true;
-        console.log("🔊 Audio unmuted after user click");
-      }
-    });
+    async function startRecording() {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      const audioChunks = [];
 
-    function startListening() {
-      fetch("/start").then(res => {
-        if (res.ok) alert("🎙️ Voice assistant started.");
-      });
+      mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+      mediaRecorder.onstop = async () => {
+        const blob = new Blob(audioChunks, { type: "audio/wav" });
+        const formData = new FormData();
+        formData.append("audio", blob, "recording.wav");
+
+        const res = await fetch("/transcribe", { method: "POST", body: formData });
+        const data = await res.json();
+
+        chatbox.innerHTML += `<div class="bubble user"><b>You:</b> ${data.question}</div>`;
+        chatbox.innerHTML += `<div class="bubble bot"><b>Gemini:</b> ${data.answer}</div>`;
+
+        player.src = "/audio?" + new Date().getTime(); // Prevent caching
+        player.play();
+      };
+
+      mediaRecorder.start();
+      setTimeout(() => mediaRecorder.stop(), 5000); // record for 5 sec
     }
-
-    function stopListening() {
-      fetch("/stop").then(res => {
-        if (res.ok) alert("🛑 Voice assistant stopped.");
-      });
-    }
-
-    function fetchLog() {
-      fetch("/get_log")
-        .then(res => res.json())
-        .then(data => {
-          if (data.length !== lastLength) {
-            lastLength = data.length;
-            const chatbox = document.getElementById("chatbox");
-            chatbox.innerHTML = "";
-            data.forEach(([q, a]) => {
-              chatbox.innerHTML += `<div class="bubble user"><b>You:</b> ${q}</div>`;
-              chatbox.innerHTML += `<div class="bubble bot"><b>Gemini:</b> ${a}</div>`;
-            });
-
-            const player = document.getElementById("audioPlayer");
-            player.src = "/audio?ts=" + new Date().getTime();
-            player.play().then(() => {
-              console.log("🔊 Playing Gemini response");
-            }).catch(err => {
-              console.warn("🔇 Autoplay blocked:", err);
-            });
-          }
-        });
-    }
-
-    setInterval(() => {
-      setTimeout(fetchLog, 1000);  // Delay to ensure voice saved
-    }, 6000);
   </script>
 </body>
-</html> 
-
-
-
-
-
-
+</html>

@@ -1,4 +1,5 @@
 Flask
-SpeechRecognition
 gTTS
 google-generativeai
+openai-whisper
+torch
